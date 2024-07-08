@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  vprodb:
+    build:
+      context: ./Docker-files/db
+    image: haleemo/vprofiledb
+    ports:
+      - "3306:3306"
+    environment: 
+      - MYSQL_ROOT_PASSWORD=vprofiledb
+    volumes:
+      - vprodbdata:/var/lib/mysql
+    container_name: vprodb
+
+  vprocache01:
+    image: memcached
+    ports: 
+      - "11211:11211"
+
+  vpromq01:
+    image: rabbitmq
+    ports: 
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+
+  vproapp:
+    build:
+      context: ./Docker-files/app
+    image: haleemo/vprofileapp
+    ports:
+      - "8080:8080"
+    volumes:
+      - vproappdata:/usr/local/tomcat/webapps
+    container_name: vproapp
+
+  vproweb:
+    build:
+      context: ./Docker-files/web
+    image: haleemo/vprofileweb
+    ports:
+      - "80:80"
+    container_name: vproweb
+
+      
+volumes:
+  vproappdata: {}
+  vprodbdata: {}  
